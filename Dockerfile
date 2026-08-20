@@ -1,8 +1,12 @@
 # Worker image = official vLLM OpenAI server image + RunPod serverless wrapper.
 # vLLM upgrades are now a single build ARG:
 #   docker buildx build --build-arg VLLM_VERSION=v0.23.0 ...
-ARG VLLM_VERSION=v0.26.0
+# DeepSeek V4 0731 is verified coherent and memory-stable on vLLM 0.25.1.
+# vLLM 0.26.0 has a confirmed output-corruption regression for this model.
+ARG VLLM_VERSION=v0.25.1
 FROM vllm/vllm-openai:${VLLM_VERSION}
+LABEL org.opencontainers.image.source="https://github.com/zdaar/runpod-worker-vllm-0251"
+LABEL org.opencontainers.image.description="RunPod vLLM worker pinned to vLLM 0.25.1 for DeepSeek V4 Flash 0731"
 
 # RunPod serverless SDK + HTTP proxy deps (vLLM itself comes from the base image).
 COPY builder/requirements.txt /requirements.txt
