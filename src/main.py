@@ -21,7 +21,10 @@ from download_model import LOCAL_MODEL_ARGS_PATH
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
-VLLM_HOST = "127.0.0.1"
+LOAD_BALANCER_MODE = os.getenv("LOAD_BALANCER_MODE", "false").lower() in {
+    "1", "true", "yes", "on"
+}
+VLLM_HOST = "0.0.0.0" if LOAD_BALANCER_MODE else "127.0.0.1"
 VLLM_PORT = os.getenv("VLLM_PORT", "8000")
 STARTUP_TIMEOUT = int(os.getenv("VLLM_STARTUP_TIMEOUT", "1200"))  # seconds
 HEALTH_POLL_INTERVAL = 2  # seconds
@@ -106,6 +109,14 @@ def main() -> None:
     except RuntimeError as e:
         logging.error("%s", e)
         sys.exit(1)
+
+    if LOAD_BALANCER_MODE:
+        logging.info(
+            "Load-balancer mode active; vLLM is listening on %s:%s",
+            VLLM_HOST,
+            VLLM_PORT,
+        )
+        sys.exit(vllm_process.wait())
 
     # Import here (not at module import time) so the RunPod SDK and handler
     # start only after the backend is confirmed healthy.

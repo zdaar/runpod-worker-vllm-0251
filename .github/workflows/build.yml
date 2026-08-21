@@ -25,6 +25,6 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/cloudcastledev/runpod-worker-vllm:v0.25.1-rp2.24.0
+          tags: ghcr.io/cloudcastledev/runpod-worker-vllm:v0.25.1-rp2.24.0-lb
           cache-from: type=gha
           cache-to: type=gha,mode=max
